@@ -1,0 +1,9 @@
+/* CSS for EduToolsXBlock */
+
+.edutools_block .count {
+    font-weight: bold;
+}
+
+.edutools_block p {
+    cursor: pointer;
+}
