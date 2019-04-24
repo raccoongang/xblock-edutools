@@ -2,8 +2,11 @@
 
 import pkg_resources
 from xblock.core import XBlock
-from xblock.fields import Integer, Scope
+from xblock.fields import Scope, String
 from xblock.fragment import Fragment
+
+# Make '_' a no-op so we can scrape strings
+_ = lambda text: text
 
 
 class EduToolsXBlock(XBlock):
@@ -11,13 +14,16 @@ class EduToolsXBlock(XBlock):
     TO-DO: document what your XBlock does.
     """
 
-    # Fields are defined on the class.  You can access them in your code as
-    # self.<fieldname>.
+    display_name = String(
+        display_name=_("Display Name"),
+        help=_("Display name for this module"),
+        default="EduTools",
+        scope=Scope.settings,
+    )
 
-    # TO-DO: delete count, and define your own fields.
-    count = Integer(
-        default=0, scope=Scope.user_state,
-        help="A simple counter, to show something happening",
+    grader_file = String(
+        display_name=_("EduTools grader file link"),
+        scope=Scope.settings,
     )
 
     def resource_string(self, path):
@@ -37,19 +43,6 @@ class EduToolsXBlock(XBlock):
         frag.add_javascript(self.resource_string("static/js/src/edutools.js"))
         frag.initialize_js('EduToolsXBlock')
         return frag
-
-    # TO-DO: change this handler to perform your own actions.  You may need more
-    # than one handler, or you may not need any handlers at all.
-    @XBlock.json_handler
-    def increment_count(self, data, suffix=''):
-        """
-        An example handler, which increments the data.
-        """
-        # Just to show data coming in...
-        assert data['hello'] == 'world'
-
-        self.count += 1
-        return {"count": self.count}
 
     # TO-DO: change this to create the scenarios you'd like to see in the
     # workbench while developing your XBlock.
