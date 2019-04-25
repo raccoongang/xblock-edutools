@@ -2,14 +2,15 @@
 
 import pkg_resources
 from xblock.core import XBlock
-from xblock.fields import Scope, String
-from xblock.fragment import Fragment
+from xblock.fields import Scope, String, Integer, Float
+from xblockutils.studio_editable import StudioEditableXBlockMixin
+from web_fragments.fragment import Fragment
 
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
 
 
-class EduToolsXBlock(XBlock):
+class EduToolsXBlock(StudioEditableXBlockMixin, XBlock):
     """
     TO-DO: document what your XBlock does.
     """
@@ -25,6 +26,29 @@ class EduToolsXBlock(XBlock):
         display_name=_("EduTools grader file link"),
         scope=Scope.settings,
     )
+
+    description = String(
+        multiline_editor='html',
+        display_name=_("EduTools problem description"),
+        default="Please run JetBtrains IDE for answer"
+    )
+
+    score = Float(
+        scope=Scope.user_state,
+        default=0
+    )
+
+    weight = Float(
+        display_name=_("Problem weight"),
+        default=1,
+        scope=Scope.settings
+    )
+
+    encrypted_result = String(
+        scope=Scope.settings,
+    )
+
+    editable_fields = ('display_name', 'grader_file', 'description', 'weight')
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
