@@ -1,5 +1,7 @@
 """TO-DO: Write a description of what this XBlock is."""
 
+from Crypto.Cipher import AES
+from base64 import b64decode
 import pkg_resources
 from xblock.core import XBlock
 from xblock.fields import Scope, String, Integer, Float
@@ -68,8 +70,36 @@ class EduToolsXBlock(StudioEditableXBlockMixin, XBlock):
         frag.initialize_js('EduToolsXBlock')
         return frag
 
-    # TO-DO: change this to create the scenarios you'd like to see in the
-    # workbench while developing your XBlock.
+    def student_view_data(self):
+        return {
+            'weight': self.weight,
+            'file_url': self.grader_file,
+        }
+
+    @XBlock.json_handler
+    def set_edutools_result(self, data, suffix=''):
+        result = data.get('result')
+        if not result:
+            return {'success': False}
+
+        try:
+            salt = result[:16]
+            result = b64decode(result[16:])
+            aes = AES.new(self.scope_ids.usage_id.block_id, AES.MODE_CFB, salt)
+            grade = float(aes.decrypt(result[16:]))
+        except Exception:
+            return {'success': False}
+        else:
+            self.runtime.publish(
+                self,
+                'grade',
+                {
+                    'value': grade,
+                    'max_value': self.weight,
+                }
+            )
+            return {'success': True}
+
     @staticmethod
     def workbench_scenarios():
         """A canned scenario for display in the workbench."""
