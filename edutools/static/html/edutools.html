@@ -1,13 +1,19 @@
-<div class="edutools_block">
-    <div class="description">{self.description}</div>
+<div class="edutools_block xmodule_display xmodule_CapaModule">
+    <div class="problem">
+        <div class="description">{self.description}</div>
 
-    <div class="answer-form">
-        <form id='result-form'>
-            <ul>
-                <li><label class="problem-group-label" for="result">Please enter result here<label></li>
-                <li><input type="text" name="result" id="result" /></li>
-                <li><button class="submit btn-brand" type="submit" name="submit" id="submit">Submit</button></li>
-            </ul>
-        </form>
+        <div class="answer-form">
+            <form id='result-form'>
+                <ul>
+                    <li><label class="problem-group-label" for="result">Please enter result here<label></li>
+                    <li><input type="text" name="result" id="result" /></span></li>
+                    <li><button class="submit btn-brand" type="submit" name="submit" id="submit">Submit</button></li>
+                </ul>
+            </form>
+        </div>
+        <div class="notification notification-submit {notification_class}">
+            <span class="icon fa {icon_class}" aria-hidden="true"></span>
+            <span class="notification-message">{msg}</span>
+        </div>
     </div>
 </div>

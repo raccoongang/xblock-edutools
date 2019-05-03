@@ -7,3 +7,7 @@
 .edutools_block p {
     cursor: pointer;
 }
+
+.answer-form ul {
+    list-style-type: none !important;
+}

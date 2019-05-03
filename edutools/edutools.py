@@ -4,7 +4,7 @@ from Crypto.Cipher import AES
 from base64 import b64decode
 import pkg_resources
 from xblock.core import XBlock
-from xblock.fields import Scope, String, Integer, Float
+from xblock.fields import Scope, String, Float, Boolean
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 from web_fragments.fragment import Fragment
 
@@ -13,10 +13,6 @@ _ = lambda text: text
 
 
 class EduToolsXBlock(StudioEditableXBlockMixin, XBlock):
-    """
-    TO-DO: document what your XBlock does.
-    """
-
     display_name = String(
         display_name=_("Display Name"),
         help=_("Display name for this module"),
@@ -38,6 +34,11 @@ class EduToolsXBlock(StudioEditableXBlockMixin, XBlock):
     score = Float(
         scope=Scope.user_state,
         default=0
+    )
+
+    submited = Boolean(
+        scope=Scope.user_state,
+        default=False
     )
 
     weight = Float(
@@ -63,8 +64,20 @@ class EduToolsXBlock(StudioEditableXBlockMixin, XBlock):
         The primary view of the EduToolsXBlock, shown to students
         when viewing courses.
         """
+        notification_class = 'hidden'
+        icon_class = ''
+        msg = ''
+        if self.submited and self.score:
+            notification_class = 'success'
+            icon_class = 'fa-check'
+            msg = _('Correct ({grade}/{weight} point)').format(grade=self.score, weight=self.weight)
+        elif self.submited:
+            notification_class = 'error'
+            icon_class = 'fa-close'
+            msg = _('Incorrect ({grade}/{weight} point)').format(grade=self.score, weight=self.weight)
+
         html = self.resource_string("static/html/edutools.html")
-        frag = Fragment(html.format(self=self))
+        frag = Fragment(html.format(self=self, notification_class=notification_class, icon_class=icon_class, msg=msg))
         frag.add_css(self.resource_string("static/css/edutools.css"))
         frag.add_javascript(self.resource_string("static/js/src/edutools.js"))
         frag.initialize_js('EduToolsXBlock')
@@ -80,25 +93,30 @@ class EduToolsXBlock(StudioEditableXBlockMixin, XBlock):
     def set_edutools_result(self, data, suffix=''):
         result = data.get('result')
         if not result:
-            return {'success': False}
+            return {'success': False, 'msg': _('Result field is empty (0/{weight} point)'.format(weight=self.weight))}
 
+        self.submited = True
         try:
-            salt = result[:16]
-            result = b64decode(result[16:])
-            aes = AES.new(self.scope_ids.usage_id.block_id, AES.MODE_CFB, salt)
-            grade = float(aes.decrypt(result[16:]))
+            result = b64decode(result)
+            salt = result[:AES.block_size]
+            aes = AES.new(self.scope_ids.usage_id.block_id, AES.MODE_CBC, salt)
+            grade = float(aes.decrypt(result[AES.block_size:]))
         except Exception:
-            return {'success': False}
+            return {'success': False, 'msg': _('Result contain a wrong data (0/{weight} point)'.format(weight=self.weight))}
         else:
+            self.score = grade
             self.runtime.publish(
                 self,
                 'grade',
                 {
-                    'value': grade,
+                    'value': self.score,
                     'max_value': self.weight,
                 }
             )
-            return {'success': True}
+            if self.score:
+                return {'success': True, 'msg': _('Correct ({grade}/{weight} point)'.format(grade=grade, weight=self.weight))}
+            else:
+                return {'success': True, 'msg': _('Incorrect (0/{weight} point)'.format(weight=self.weight))}
 
     @staticmethod
     def workbench_scenarios():
