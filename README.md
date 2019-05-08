@@ -29,9 +29,8 @@ settings:
 
 ## Usage
 
-    ![Studio interface](doc/img/studio1.png)
-    ![Studio interface](doc/img/studio2.png)
-
 1. "EduTools grader file link" - link to zip file for IDE
 2. "EduTools problem description" - Description of problem
+    ![Studio interface](doc/img/studio1.png)
 3. "Problem weight" - maximum score that a student can score after passing this block
+    ![Studio interface](doc/img/studio2.png)
