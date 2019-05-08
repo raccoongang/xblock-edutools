@@ -31,6 +31,7 @@ setup(
     ],
     install_requires=[
         'XBlock',
+        'pycrypto'
     ],
     entry_points={
         'xblock.v1': [
