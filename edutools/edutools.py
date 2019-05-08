@@ -83,7 +83,7 @@ class EduToolsXBlock(StudioEditableXBlockMixin, XBlock):
         frag.initialize_js('EduToolsXBlock')
         return frag
 
-    def student_view_data(self):
+    def student_view_data(self, context=None):
         return {
             'weight': self.weight,
             'file_url': self.grader_file,
