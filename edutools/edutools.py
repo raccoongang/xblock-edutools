@@ -104,7 +104,7 @@ class EduToolsXBlock(StudioEditableXBlockMixin, XBlock):
         except Exception:
             return {'success': False, 'msg': _('Result contain a wrong data (0/{weight} point)'.format(weight=self.weight))}
         else:
-            self.score = grade
+            self.score = grade > self.weight and self.weight or grade
             self.runtime.publish(
                 self,
                 'grade',
