@@ -100,7 +100,7 @@ class EduToolsXBlock(StudioEditableXBlockMixin, XBlock):
             result = b64decode(result)
             salt = result[:AES.block_size]
             aes = AES.new(self.scope_ids.usage_id.block_id, AES.MODE_CBC, salt)
-            grade = float(aes.decrypt(result[AES.block_size:]))
+            grade = float(aes.decrypt(result[AES.block_size:]).replace(',', '.'))
         except Exception:
             return {'success': False, 'msg': _('Result contain a wrong data (0/{weight} point)'.format(weight=self.weight))}
         else:
